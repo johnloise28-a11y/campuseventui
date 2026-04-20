@@ -1,64 +1,127 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-export default function Events() {
-  const [events, setEvents] = useState([]);
+function Events() {
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchData = () => {
+    setLoading(true);
     fetch("https://jsonplaceholder.typicode.com/posts")
-      .then(res => res.json())
-      .then(data => {
-        setEvents(data.slice(0, 10));
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+      })
+      .then((data) => {
+        setPosts(data.slice(0, 20));
+        setLastUpdated(new Date());
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
         setLoading(false);
       });
   };
 
-  // FIRST LOAD
+  // Initial fetch
   useEffect(() => {
     fetchData();
   }, []);
 
-  // AUTO REFRESH
+  // Auto-refresh every 30 seconds (Step 10 - Real-Time)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
-
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  const filtered = posts.filter((post) =>
+    post.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) return <p style={{ padding: "2rem" }}>Loading events...</p>;
+  if (error) return <p style={{ padding: "2rem", color: "red" }}>Error: {error}</p>;
 
   return (
-    <div>
-      <h2>Events</h2>
+    <div style={{ padding: "2rem" }}>
+      <h1>Events</h1>
 
-      {/* ✅ STEP 13: SEARCH INPUT */}
+      {/* Step 10 - Last Updated */}
+      <p style={{ color: "gray", fontSize: "0.85rem" }}>
+        Last updated: {lastUpdated.toLocaleTimeString()}
+      </p>
+
+      {/* Step 13 - Search Feature */}
       <input
         type="text"
         placeholder="Search events..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        style={{ padding: "8px", marginBottom: "10px", width: "200px" }}
+        style={{
+          padding: "0.5rem 1rem",
+          marginBottom: "1.5rem",
+          width: "100%",
+          maxWidth: "400px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          fontSize: "1rem",
+        }}
       />
 
-      {/* ✅ FILTERED EVENTS */}
-      {events
-        .filter(e =>
-          e.title.toLowerCase().includes(search.toLowerCase())
-        )
-        .map(e => (
-          <div key={e.id}>
-            <Link to={`/events/${e.id}`}>{e.title}</Link>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
+        {filtered.map((post) => (
+          <div
+            key={post.id}
+            style={{
+              background: "#fff",
+              border: "1px solid #e0e0e0",
+              borderRadius: "12px",
+              padding: "1.2rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-4px)"}
+            onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+          >
+            <span style={{
+              background: "#e8f0fe",
+              color: "#1a73e8",
+              fontSize: "0.75rem",
+              padding: "2px 8px",
+              borderRadius: "20px",
+              marginBottom: "0.5rem",
+              display: "inline-block",
+            }}>
+              Event #{post.id}
+            </span>
+            <h3 style={{ margin: "0.5rem 0", fontSize: "1rem", textTransform: "capitalize" }}>
+              {post.title}
+            </h3>
+            <p style={{ fontSize: "0.85rem", color: "#666", marginBottom: "1rem" }}>
+              {post.body.slice(0, 80)}...
+            </p>
+            <Link
+              to={`/events/${post.id}`}
+              style={{
+                background: "#1a73e8",
+                color: "#fff",
+                padding: "0.4rem 1rem",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontSize: "0.85rem",
+              }}
+            >
+              View Details
+            </Link>
           </div>
         ))}
-
-      {/* ✅ OPTIONAL: No results message */}
-      {events.filter(e =>
-        e.title.toLowerCase().includes(search.toLowerCase())
-      ).length === 0 && <p>No events found</p>}
+      </div>
     </div>
   );
 }
+
+export default Events;
