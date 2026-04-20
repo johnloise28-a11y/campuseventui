@@ -34,13 +34,33 @@ export function EventProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [darkMode, setDarkMode] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("darkMode") === "true";
+  });
 
-  const fetchEvents = () => {
-    // Only fetch from API if we haven't loaded data yet
-    if (!hasFetched) {
-      setLoading(true);
+  // Save events to localStorage whenever they change
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem("campusEvents", JSON.stringify(state.events));
+    }
+  }, [state.events, loading]);
+
+  // Save dark mode preference
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode);
+  }, [darkMode]);
+
+  useEffect(() => {
+    // Check if we already have saved events in localStorage
+    const saved = localStorage.getItem("campusEvents");
+
+    if (saved) {
+      // Use saved events (respects deletions)
+      dispatch({ type: "SET_EVENTS", payload: JSON.parse(saved) });
+      setLastUpdated(new Date());
+      setLoading(false);
+    } else {
+      // First time — fetch from API and save
       fetch("https://jsonplaceholder.typicode.com/posts")
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch events");
@@ -56,24 +76,15 @@ export function EventProvider({ children }) {
           dispatch({ type: "SET_EVENTS", payload: formatted });
           setLastUpdated(new Date());
           setLoading(false);
-          setHasFetched(true);
         })
         .catch((err) => {
           setError(err.message);
           setLoading(false);
         });
-    } else {
-      // After first load, just update the timestamp (real-time indicator)
-      setLastUpdated(new Date());
     }
-  };
-
-  // Fetch once on load
-  useEffect(() => {
-    fetchEvents();
   }, []);
 
-  // Auto-refresh timestamp every 30 seconds (real-time behavior)
+  // Auto-refresh timestamp every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setLastUpdated(new Date());

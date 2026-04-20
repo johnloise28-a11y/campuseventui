@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEvents } from "../context/EventProvider";
 
 function Navbar() {
-  const { isLoggedIn, logout, darkMode, toggleDarkMode } = useEvents();
+  const { isLoggedIn, logout, darkMode } = useEvents();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -43,24 +43,6 @@ function Navbar() {
           </Link>
         ))}
 
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          style={{
-            background: darkMode ? "#f0f0f0" : "rgba(255,255,255,0.2)",
-            color: darkMode ? "#111" : "#fff",
-            border: "none",
-            padding: "0.4rem 1rem",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "0.85rem",
-          }}
-        >
-          {darkMode ? "☀️ Light" : "🌙 Dark"}
-        </button>
-
-        {/* Login / Logout */}
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
