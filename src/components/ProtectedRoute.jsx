@@ -1,7 +1,14 @@
 import { Navigate } from "react-router-dom";
+import { useEvents } from "../context/EventProvider";
 
-export default function ProtectedRoute({ children }) {
-  const isLoggedIn = false; // change later
+function ProtectedRoute({ children }) {
+  const { isLoggedIn } = useEvents();
 
-  return isLoggedIn ? children : <Navigate to="/login" />;
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 }
+
+export default ProtectedRoute;

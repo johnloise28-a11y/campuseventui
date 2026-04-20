@@ -1,13 +1,79 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEvents } from "../context/EventProvider";
 
-export default function Navbar() {
+function Navbar() {
+  const { isLoggedIn, logout } = useEvents();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
-    <nav>
-      <Link to="/">Home</Link> | 
-      <Link to="/events">Events</Link> | 
-      <Link to="/dashboard">Dashboard</Link> | 
-      <Link to="/login">Login</Link>
+    <nav style={{
+      background: "#1a73e8",
+      padding: "1rem 2rem",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}>
+      <span style={{ color: "#fff", fontWeight: "bold", fontSize: "1.2rem" }}>
+        🎓 CampusEventUI
+      </span>
+      <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+        {[
+          { to: "/", label: "Home" },
+          { to: "/events", label: "Events" },
+          { to: "/dashboard", label: "Dashboard" },
+        ].map(({ to, label }) => (
+          <Link
+            key={to}
+            to={to}
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+              fontWeight: "500",
+              fontSize: "0.95rem",
+            }}
+          >
+            {label}
+          </Link>
+        ))}
+
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "#fff",
+              color: "#1a73e8",
+              border: "none",
+              padding: "0.4rem 1rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            style={{
+              background: "#fff",
+              color: "#1a73e8",
+              padding: "0.4rem 1rem",
+              borderRadius: "8px",
+              textDecoration: "none",
+              fontWeight: "600",
+            }}
+          >
+            Login
+          </Link>
+        )}
+      </div>
     </nav>
   );
-  <nav style={{ background: "#333", padding: "10px" }}></nav>
 }
+
+export default Navbar;
