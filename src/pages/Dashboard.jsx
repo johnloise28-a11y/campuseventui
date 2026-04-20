@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEvents } from "../context/EventProvider";
 
 function Dashboard() {
-  const { state, loading, addEvent, deleteEvent, toggleStatus } = useEvents();
+  const { state, loading, addEvent, deleteEvent, toggleStatus, darkMode } = useEvents();
   const [newTitle, setNewTitle] = useState("");
 
   const handleAdd = () => {
@@ -16,12 +16,18 @@ function Dashboard() {
     setNewTitle("");
   };
 
-  if (loading) return <p style={{ padding: "2rem", textAlign: "center" }}>Loading events...</p>;
+  if (loading) return (
+    <p style={{ padding: "2rem", textAlign: "center", color: darkMode ? "#f0f0f0" : "#111" }}>
+      Loading events...
+    </p>
+  );
 
   return (
     <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center", fontSize: "2.5rem" }}>Dashboard</h1>
-      <p style={{ textAlign: "center", color: "#666", marginBottom: "2rem" }}>
+      <h1 style={{ textAlign: "center", fontSize: "2.5rem", color: darkMode ? "#f0f0f0" : "#111" }}>
+        Dashboard
+      </h1>
+      <p style={{ textAlign: "center", color: darkMode ? "#aaa" : "#666", marginBottom: "2rem" }}>
         Welcome! Manage your campus events below.
       </p>
 
@@ -38,6 +44,8 @@ function Dashboard() {
             border: "1px solid #ccc",
             fontSize: "1rem",
             flex: 1,
+            background: darkMode ? "#2a2a2a" : "#fff",
+            color: darkMode ? "#f0f0f0" : "#111",
           }}
         />
         <button
@@ -63,21 +71,28 @@ function Dashboard() {
           <div
             key={event.id}
             style={{
-              background: "#fff",
-              border: "1px solid #e0e0e0",
+              background: darkMode ? "#1e1e1e" : "#fff",
+              border: `1px solid ${darkMode ? "#333" : "#e0e0e0"}`,
               borderRadius: "10px",
               padding: "1rem 1.5rem",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             }}
           >
             <div>
-              <strong style={{ textTransform: "capitalize" }}>{event.title}</strong>
+              <strong style={{
+                textTransform: "capitalize",
+                color: darkMode ? "#f0f0f0" : "#111",
+              }}>
+                {event.title}
+              </strong>
               <span style={{
                 marginLeft: "0.75rem",
-                background: event.status === "active" ? "#e6f4ea" : "#fce8e6",
+                background: event.status === "active"
+                  ? (darkMode ? "#1a3a2a" : "#e6f4ea")
+                  : (darkMode ? "#3a1a1a" : "#fce8e6"),
                 color: event.status === "active" ? "#1e8e3e" : "#d93025",
                 padding: "2px 10px",
                 borderRadius: "20px",
@@ -91,7 +106,8 @@ function Dashboard() {
               <button
                 onClick={() => toggleStatus(event.id)}
                 style={{
-                  background: "#f1f3f4",
+                  background: darkMode ? "#2a2a2a" : "#f1f3f4",
+                  color: darkMode ? "#f0f0f0" : "#111",
                   border: "none",
                   padding: "0.4rem 0.9rem",
                   borderRadius: "8px",
@@ -104,7 +120,7 @@ function Dashboard() {
               <button
                 onClick={() => deleteEvent(event.id)}
                 style={{
-                  background: "#fce8e6",
+                  background: darkMode ? "#3a1a1a" : "#fce8e6",
                   color: "#d93025",
                   border: "none",
                   padding: "0.4rem 0.9rem",

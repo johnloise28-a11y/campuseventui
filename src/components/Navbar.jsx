@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEvents } from "../context/EventProvider";
 
 function Navbar() {
-  const { isLoggedIn, logout } = useEvents();
+  const { isLoggedIn, logout, darkMode, toggleDarkMode } = useEvents();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -12,16 +12,18 @@ function Navbar() {
 
   return (
     <nav style={{
-      background: "#1a73e8",
+      background: darkMode ? "#1a1a2e" : "#1a73e8",
       padding: "1rem 2rem",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      transition: "background 0.3s",
     }}>
       <span style={{ color: "#fff", fontWeight: "bold", fontSize: "1.2rem" }}>
         🎓 CampusEventUI
       </span>
-      <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+
+      <div style={{ display: "flex", gap: "1.2rem", alignItems: "center" }}>
         {[
           { to: "/", label: "Home" },
           { to: "/events", label: "Events" },
@@ -41,6 +43,24 @@ function Navbar() {
           </Link>
         ))}
 
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          style={{
+            background: darkMode ? "#f0f0f0" : "rgba(255,255,255,0.2)",
+            color: darkMode ? "#111" : "#fff",
+            border: "none",
+            padding: "0.4rem 1rem",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "0.85rem",
+          }}
+        >
+          {darkMode ? "☀️ Light" : "🌙 Dark"}
+        </button>
+
+        {/* Login / Logout */}
         {isLoggedIn ? (
           <button
             onClick={handleLogout}

@@ -1,38 +1,21 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
-import { useState } from "react";
+import { useEvents } from "../context/EventProvider";
 
-export default function Layout() {
-  const [dark, setDark] = useState(false);
-
-  const themeStyle = {
-    backgroundColor: dark ? "#121212" : "#ffffff",
-    color: dark ? "#ffffff" : "#000000",
-    minHeight: "100vh",
-    transition: "0.3s ease"
-  };
+function Layout() {
+  const { darkMode } = useEvents();
 
   return (
-    <div style={themeStyle}>
-      {/* ✅ DARK MODE BUTTON */}
-      <button
-        onClick={() => setDark(!dark)}
-        style={{
-          margin: "10px",
-          padding: "8px 12px",
-          cursor: "pointer",
-          borderRadius: "5px",
-          border: "none",
-          background: dark ? "#444" : "#ddd"
-        }}
-      >
-        {dark ? "Light Mode ☀️" : "Dark Mode 🌙"}
-      </button>
-
+    <div style={{
+      minHeight: "100vh",
+      background: darkMode ? "#121212" : "#f5f7fa",
+      color: darkMode ? "#f0f0f0" : "#111",
+      transition: "background 0.3s, color 0.3s",
+    }}>
       <Navbar />
-      <div style={{ padding: "15px" }}>
-        <Outlet />
-      </div>
+      <Outlet />
     </div>
   );
 }
+
+export default Layout;

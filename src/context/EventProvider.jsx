@@ -34,40 +34,49 @@ export function EventProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [darkMode, setDarkMode] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const fetchEvents = () => {
-    setLoading(true);
-    fetch("https://jsonplaceholder.typicode.com/posts")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch events");
-        return res.json();
-      })
-      .then((data) => {
-        const formatted = data.slice(0, 20).map((post) => ({
-          id: post.id,
-          title: post.title,
-          body: post.body,
-          status: "active",
-        }));
-        dispatch({ type: "SET_EVENTS", payload: formatted });
-        setLastUpdated(new Date());
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    // Only fetch from API if we haven't loaded data yet
+    if (!hasFetched) {
+      setLoading(true);
+      fetch("https://jsonplaceholder.typicode.com/posts")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch events");
+          return res.json();
+        })
+        .then((data) => {
+          const formatted = data.slice(0, 20).map((post) => ({
+            id: post.id,
+            title: post.title,
+            body: post.body,
+            status: "active",
+          }));
+          dispatch({ type: "SET_EVENTS", payload: formatted });
+          setLastUpdated(new Date());
+          setLoading(false);
+          setHasFetched(true);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    } else {
+      // After first load, just update the timestamp (real-time indicator)
+      setLastUpdated(new Date());
+    }
   };
 
-  // Initial fetch
+  // Fetch once on load
   useEffect(() => {
     fetchEvents();
   }, []);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh timestamp every 30 seconds (real-time behavior)
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchEvents();
+      setLastUpdated(new Date());
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -77,6 +86,7 @@ export function EventProvider({ children }) {
   const toggleStatus = (id) => dispatch({ type: "TOGGLE_STATUS", payload: id });
   const login = () => setIsLoggedIn(true);
   const logout = () => setIsLoggedIn(false);
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   return (
     <EventContext.Provider value={{
@@ -90,6 +100,8 @@ export function EventProvider({ children }) {
       isLoggedIn,
       login,
       logout,
+      darkMode,
+      toggleDarkMode,
     }}>
       {children}
     </EventContext.Provider>

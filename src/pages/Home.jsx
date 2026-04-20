@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useEvents } from "../context/EventProvider";
 
 function Home() {
+  const { darkMode } = useEvents();
+
   return (
     <div style={{
       padding: "4rem 2rem",
@@ -11,7 +14,12 @@ function Home() {
       <h1 style={{ fontSize: "2.5rem", color: "#1a73e8", marginBottom: "1rem" }}>
         Welcome to CampusEventUI 🎓
       </h1>
-      <p style={{ fontSize: "1.1rem", color: "#555", marginBottom: "2rem", lineHeight: "1.8" }}>
+      <p style={{
+        fontSize: "1.1rem",
+        color: darkMode ? "#aaa" : "#555",
+        marginBottom: "2rem",
+        lineHeight: "1.8",
+      }}>
         Stay updated with the latest campus events. Browse upcoming activities,
         join events, and manage your schedule all in one place.
       </p>
@@ -34,7 +42,7 @@ function Home() {
         <Link
           to="/dashboard"
           style={{
-            background: "#fff",
+            background: darkMode ? "#2a2a2a" : "#fff",
             color: "#1a73e8",
             padding: "0.75rem 2rem",
             borderRadius: "8px",
@@ -63,8 +71,8 @@ function Home() {
           <div
             key={title}
             style={{
-              background: "#fff",
-              border: "1px solid #e0e0e0",
+              background: darkMode ? "#1e1e1e" : "#fff",
+              border: `1px solid ${darkMode ? "#333" : "#e0e0e0"}`,
               borderRadius: "12px",
               padding: "1.5rem",
               width: "180px",
@@ -72,8 +80,10 @@ function Home() {
             }}
           >
             <div style={{ fontSize: "2rem" }}>{icon}</div>
-            <h3 style={{ margin: "0.5rem 0", fontSize: "0.95rem" }}>{title}</h3>
-            <p style={{ fontSize: "0.8rem", color: "#777" }}>{desc}</p>
+            <h3 style={{ margin: "0.5rem 0", fontSize: "0.95rem", color: darkMode ? "#f0f0f0" : "#111" }}>
+              {title}
+            </h3>
+            <p style={{ fontSize: "0.8rem", color: darkMode ? "#aaa" : "#777" }}>{desc}</p>
           </div>
         ))}
       </div>
