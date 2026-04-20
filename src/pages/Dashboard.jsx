@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEvents } from "../context/EventProvider";
 
 function Dashboard() {
-  const { state, addEvent, deleteEvent, toggleStatus } = useEvents();
+  const { state, loading, addEvent, deleteEvent, toggleStatus } = useEvents();
   const [newTitle, setNewTitle] = useState("");
 
   const handleAdd = () => {
@@ -10,30 +10,34 @@ function Dashboard() {
     addEvent({
       id: Date.now(),
       title: newTitle,
+      body: "Manually added event.",
       status: "active",
     });
     setNewTitle("");
   };
 
+  if (loading) return <p style={{ padding: "2rem", textAlign: "center" }}>Loading events...</p>;
+
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Dashboard</h1>
-      <p>Welcome! Manage your campus events below.</p>
+    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center", fontSize: "2.5rem" }}>Dashboard</h1>
+      <p style={{ textAlign: "center", color: "#666", marginBottom: "2rem" }}>
+        Welcome! Manage your campus events below.
+      </p>
 
       {/* Add Event */}
-      <div style={{ display: "flex", gap: "0.5rem", margin: "1.5rem 0" }}>
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem" }}>
         <input
           type="text"
           placeholder="New event title..."
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           style={{
-            padding: "0.5rem 1rem",
+            padding: "0.6rem 1rem",
             borderRadius: "8px",
             border: "1px solid #ccc",
             fontSize: "1rem",
             flex: 1,
-            maxWidth: "400px",
           }}
         />
         <button
@@ -42,10 +46,11 @@ function Dashboard() {
             background: "#1a73e8",
             color: "#fff",
             border: "none",
-            padding: "0.5rem 1.2rem",
+            padding: "0.6rem 1.5rem",
             borderRadius: "8px",
             cursor: "pointer",
             fontSize: "1rem",
+            fontWeight: "600",
           }}
         >
           Add Event
@@ -69,7 +74,7 @@ function Dashboard() {
             }}
           >
             <div>
-              <strong>{event.title}</strong>
+              <strong style={{ textTransform: "capitalize" }}>{event.title}</strong>
               <span style={{
                 marginLeft: "0.75rem",
                 background: event.status === "active" ? "#e6f4ea" : "#fce8e6",
@@ -91,6 +96,7 @@ function Dashboard() {
                   padding: "0.4rem 0.9rem",
                   borderRadius: "8px",
                   cursor: "pointer",
+                  fontWeight: "500",
                 }}
               >
                 Toggle
@@ -104,6 +110,7 @@ function Dashboard() {
                   padding: "0.4rem 0.9rem",
                   borderRadius: "8px",
                   cursor: "pointer",
+                  fontWeight: "500",
                 }}
               >
                 Delete
